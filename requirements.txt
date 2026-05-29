@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+requests
+duckdb
+pyarrow
+apache-airflow
+dbt-duckdb
+pyyaml
