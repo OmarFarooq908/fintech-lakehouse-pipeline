@@ -1,0 +1,1 @@
+"""Synthetic fintech data generators."""
