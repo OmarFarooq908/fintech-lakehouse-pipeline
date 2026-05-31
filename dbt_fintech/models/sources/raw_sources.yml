@@ -1,0 +1,36 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Synthetic fintech raw views over partitioned Parquet files in the local data lake.
+    schema: raw
+    tables:
+      - name: customers_raw
+        identifier: customers_raw
+      - name: accounts_raw
+        identifier: accounts_raw
+      - name: cards_raw
+        identifier: cards_raw
+      - name: merchants_raw
+        identifier: merchants_raw
+      - name: payment_events_raw
+        identifier: payment_events_raw
+      - name: chargebacks_raw
+        identifier: chargebacks_raw
+      - name: risk_events_raw
+        identifier: risk_events_raw
+      - name: fx_rates_raw
+        identifier: fx_rates_raw
+
+  - name: observability
+    description: Audit and replay tables that capture ingest quality and SLA signals.
+    schema: observability
+    tables:
+      - name: ingest_batch_manifest
+        identifier: ingest_batch_manifest
+      - name: ingest_run_audit
+        identifier: ingest_run_audit
+      - name: quarantine_payloads
+        identifier: quarantine_payloads
+      - name: replay_queue
+        identifier: replay_queue
