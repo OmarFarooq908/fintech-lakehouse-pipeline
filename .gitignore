@@ -40,7 +40,9 @@ dbt_packages/
 target/
 logs/
 .user.yml
+# Ignore personal dbt profiles; project profile is committed (env-based, no secrets)
 profiles.yml
+!dbt_fintech/profiles.yml
 
 # DuckDB / local data
 data/*

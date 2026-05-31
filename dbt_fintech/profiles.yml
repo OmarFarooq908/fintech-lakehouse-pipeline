@@ -1,0 +1,8 @@
+dbt_fintech:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('DUCKDB_PATH', '../data/fintech.duckdb') }}"
+      schema: "{{ env_var('DUCKDB_CURATED_SCHEMA', 'curated') }}"
+      threads: "{{ env_var('DBT_THREADS', '4') | int }}"

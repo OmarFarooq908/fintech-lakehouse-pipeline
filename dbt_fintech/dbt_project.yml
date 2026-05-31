@@ -1,0 +1,46 @@
+name: dbt_fintech
+version: 1.0.0
+config-version: 2
+
+profile: dbt_fintech
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+vars:
+  raw_schema: raw
+  stage_schema: stage
+  curated_schema: curated
+  observability_schema: observability
+  late_arrival_grace_days: 3
+
+models:
+  dbt_fintech:
+    +persist_docs:
+      relation: true
+      columns: true
+    staging:
+      +schema: stage
+      +materialized: view
+    intermediate:
+      +schema: stage
+      +materialized: view
+    marts:
+      core:
+        +schema: curated
+        +materialized: table
+      risk:
+        +schema: curated
+        +materialized: table
+
+snapshots:
+  dbt_fintech:
+    +target_schema: curated
