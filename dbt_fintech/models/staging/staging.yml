@@ -1,0 +1,179 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: Parsed and deduplicated customer entities from raw API payloads.
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+          - unique
+      - name: customer_segment
+        tests:
+          - accepted_values:
+              values: ['consumer', 'small_business', 'enterprise']
+      - name: kyc_status
+        tests:
+          - accepted_values:
+              values: ['pending', 'approved', 'rejected']
+      - name: risk_band
+        tests:
+          - accepted_values:
+              values: ['low', 'medium', 'high']
+
+  - name: stg_accounts
+    description: Parsed and deduplicated account entities.
+    columns:
+      - name: account_id
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: product_type
+        tests:
+          - accepted_values:
+              values: ['checking', 'savings', 'wallet', 'merchant_settlement']
+      - name: account_status
+        tests:
+          - accepted_values:
+              values: ['active', 'restricted', 'closed']
+
+  - name: stg_cards
+    description: Parsed and deduplicated card entities.
+    columns:
+      - name: card_id
+        tests:
+          - not_null
+          - unique
+      - name: account_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_accounts')
+              field: account_id
+      - name: card_brand
+        tests:
+          - accepted_values:
+              values: ['visa', 'mastercard', 'amex']
+      - name: card_type
+        tests:
+          - accepted_values:
+              values: ['debit', 'credit', 'virtual']
+      - name: card_status
+        tests:
+          - accepted_values:
+              values: ['active', 'blocked', 'expired']
+
+  - name: stg_merchants
+    description: Parsed and deduplicated merchant entities.
+    columns:
+      - name: merchant_id
+        tests:
+          - not_null
+          - unique
+      - name: pricing_tier
+        tests:
+          - accepted_values:
+              values: ['standard', 'plus', 'strategic']
+
+  - name: stg_payment_events
+    description: Parsed payment events at the raw event grain.
+    columns:
+      - name: payment_event_id
+        tests:
+          - not_null
+          - unique
+      - name: payment_id
+        tests:
+          - not_null
+      - name: customer_id
+        tests:
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: account_id
+        tests:
+          - relationships:
+              to: ref('stg_accounts')
+              field: account_id
+      - name: card_id
+        tests:
+          - relationships:
+              to: ref('stg_cards')
+              field: card_id
+      - name: merchant_id
+        tests:
+          - relationships:
+              to: ref('stg_merchants')
+              field: merchant_id
+      - name: payment_status
+        tests:
+          - accepted_values:
+              values: ['authorized', 'captured', 'settled', 'refunded']
+      - name: amount_minor
+        tests:
+          - not_null
+      - name: fee_minor
+        tests:
+          - not_null
+
+  - name: stg_chargebacks
+    description: Parsed chargeback cases captured from the dispute feed.
+    columns:
+      - name: chargeback_id
+        tests:
+          - not_null
+          - unique
+      - name: chargeback_reason
+        tests:
+          - accepted_values:
+              values: ['fraud', 'duplicate', 'product_not_received', 'merchant_dispute']
+      - name: chargeback_status
+        tests:
+          - accepted_values:
+              values: ['open', 'won', 'lost']
+      - name: amount_minor
+        tests:
+          - not_null
+
+  - name: stg_risk_events
+    description: Parsed payment risk decisions and scores.
+    columns:
+      - name: risk_event_id
+        tests:
+          - not_null
+          - unique
+      - name: decision
+        tests:
+          - accepted_values:
+              values: ['approve', 'review', 'decline']
+      - name: risk_reason
+        tests:
+          - accepted_values:
+              values: ['velocity', 'ip_mismatch', 'device_reuse', 'chargeback_history', 'sanctions_match']
+      - name: risk_score
+        tests:
+          - not_null
+
+  - name: stg_fx_rates
+    description: Parsed FX rates for payment currency normalization.
+    columns:
+      - name: fx_rate_id
+        tests:
+          - not_null
+          - unique
+      - name: base_currency
+        tests:
+          - accepted_values:
+              values: ['USD']
+      - name: quote_currency
+        tests:
+          - not_null
+      - name: conversion_rate
+        tests:
+          - not_null
